@@ -1,6 +1,6 @@
-import click
+import typer
 
-@click.group()
-def app():
-    """Epic Events CRM — Command Line Interface."""
-    pass
+app = typer.Typer(help="Epic Events CRM — Command Line Interface.")
+
+if __name__ == "__main__":
+    app()
