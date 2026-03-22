@@ -13,6 +13,7 @@ Deletion policy:
     preserves historical records and prevents orphaned data.
 """
 
+import bcrypt
 from datetime import datetime
 from sqlalchemy import String, Enum as SAEnum, DateTime, Boolean, func, true
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -102,3 +103,34 @@ class Collaborator(Base):
             bool: True if role is SUPPORT.
         """
         return self.role == RoleEnum.SUPPORT
+
+    def set_password(self, plain_text: str) -> None:
+        """Hash and store the password using bcrypt.
+
+        Uses a cost factor of 12 for brute-force resistance.
+        The plain text password is never stored.
+
+        Args:
+            plain_text: The raw password string to hash.
+        """
+        self.password_hash = bcrypt.hashpw(
+            plain_text.encode("utf-8"),
+            bcrypt.gensalt(rounds=12)
+        ).decode("utf-8")
+
+    def verify_password(self, plain_text: str) -> bool:
+        """Verify a plain text password against the stored hash.
+
+        Uses bcrypt.checkpw which is timing-safe against
+        brute-force and timing attacks.
+
+        Args:
+            plain_text: The raw password string to verify.
+
+        Returns:
+            bool: True if the password matches the stored hash.
+        """
+        return bcrypt.checkpw(
+            plain_text.encode("utf-8"),
+            self.password_hash.encode("utf-8")
+        )
