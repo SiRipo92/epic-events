@@ -75,3 +75,30 @@ class Collaborator(Base):
     def full_name_formal(self) -> str:
         """Return the name in formal format: LAST NAME, First name."""
         return f"{self.last_name.upper()}, {self.first_name}"
+
+    @property
+    def is_manager(self) -> bool:
+        """Return True if this collaborator has the MANAGEMENT role.
+
+        Returns:
+            bool: True if role is MANAGEMENT.
+        """
+        return self.role == RoleEnum.MANAGEMENT
+
+    @property
+    def is_commercial(self) -> bool:
+        """Return True if this collaborator has the COMMERCIAL role.
+
+        Returns:
+            bool: True if role is COMMERCIAL.
+        """
+        return self.role == RoleEnum.COMMERCIAL
+
+    @property
+    def is_support(self) -> bool:
+        """Return True if this collaborator has the SUPPORT role.
+
+        Returns:
+            bool: True if role is SUPPORT.
+        """
+        return self.role == RoleEnum.SUPPORT
