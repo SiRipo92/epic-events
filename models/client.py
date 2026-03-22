@@ -65,7 +65,7 @@ class Client(Base):
     status: Mapped[ClientStatus] = mapped_column(
         SAEnum(ClientStatus),
         default=ClientStatus.PROSPECT,
-        server_default="prospect",
+        server_default="PROSPECT",
         nullable=False
     )
 
