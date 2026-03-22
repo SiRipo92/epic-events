@@ -169,6 +169,19 @@ def cancelled_contract():
 
 
 @pytest.fixture
+def pending_contract():
+    """A contract in PENDING status — awaiting client signature."""
+    c = Contract()
+    c.id = 7
+    c.client_id = 1
+    c.commercial_id = 2
+    c.total_amount = Decimal("5000.00")
+    c.remaining_amount = Decimal("5000.00")
+    c.status = ContractStatus.PENDING
+    return c
+
+
+@pytest.fixture
 def fully_paid_contract():
     """A signed contract with zero remaining amount."""
     c = Contract()
