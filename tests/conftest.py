@@ -13,7 +13,7 @@ set their own attributes directly.
 """
 
 import pytest
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 
 from models.collaborator import Collaborator
@@ -246,6 +246,34 @@ def eight_hour_event():
     e.title = "Workshop"
     e.start_date = datetime(2025, 11, 1, 9, 0)
     e.end_date = datetime(2025, 11, 1, 17, 0)
+    e.support_id = None
+    e.is_cancelled = False
+    return e
+
+
+@pytest.fixture
+def past_event():
+    """An event that ended yesterday — is_past should return True."""
+    e = Event()
+    e.id = 4
+    e.contract_id = 2
+    e.title = "Past Conference"
+    e.start_date = datetime.now(timezone.utc) - timedelta(days=2)
+    e.end_date = datetime.now(timezone.utc) - timedelta(days=1)
+    e.support_id = None
+    e.is_cancelled = False
+    return e
+
+
+@pytest.fixture
+def future_event():
+    """An event starting tomorrow — is_past should return False."""
+    e = Event()
+    e.id = 5
+    e.contract_id = 2
+    e.title = "Upcoming Gala"
+    e.start_date = datetime.now(timezone.utc) + timedelta(days=1)
+    e.end_date = datetime.now(timezone.utc) + timedelta(days=2)
     e.support_id = None
     e.is_cancelled = False
     return e
