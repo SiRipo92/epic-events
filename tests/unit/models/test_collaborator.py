@@ -54,3 +54,45 @@ class TestCollaboratorRoleProperties:
         assert management_collaborator.is_manager    is is_manager
         assert management_collaborator.is_commercial is is_commercial
         assert management_collaborator.is_support    is is_support
+
+
+class TestCollaboratorPassword:
+    """Tests for set_password() and verify_password() domain methods.
+
+    Happy path:  correct password verifies True.
+    Sad paths:   wrong password, empty password.
+    Edge cases:  special characters, very long password.
+    """
+
+    def test_set_password_stores_hash_not_plaintext(self, management_collaborator):
+        """Happy path: password is hashed — plaintext is never stored."""
+        management_collaborator.set_password("securepassword123")
+        assert management_collaborator.password_hash != "securepassword123"
+        assert management_collaborator.password_hash.startswith("$2b$")
+
+    def test_verify_password_correct(self, management_collaborator):
+        """Happy path: correct password returns True."""
+        management_collaborator.set_password("securepassword123")
+        assert management_collaborator.verify_password("securepassword123") is True
+
+    def test_verify_password_wrong(self, management_collaborator):
+        """Sad path: incorrect password returns False."""
+        management_collaborator.set_password("securepassword123")
+        assert management_collaborator.verify_password("wrongpassword") is False
+
+    def test_verify_password_empty_string(self, management_collaborator):
+        """Sad path: empty string does not match a real password."""
+        management_collaborator.set_password("securepassword123")
+        assert management_collaborator.verify_password("") is False
+
+    @pytest.mark.parametrize("password", [
+        "p@$$w0rd!",              # special characters
+        "a" * 72,                 # bcrypt max length boundary
+        "pässwörð",               # unicode characters
+    ])
+    def test_set_and_verify_various_passwords(
+        self, management_collaborator, password
+    ):
+        """Edge case: various password formats hash and verify correctly."""
+        management_collaborator.set_password(password)
+        assert management_collaborator.verify_password(password) is True
