@@ -12,7 +12,7 @@ Deletion policy:
     later by Management.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import String, ForeignKey, Integer, Text, DateTime, Boolean, false
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from models.base import Base
@@ -78,3 +78,15 @@ class Event(Base):
         """
         delta = self.end_date - self.start_date
         return delta.total_seconds() / 3600
+
+    @property
+    def is_past(self) -> bool:
+        """Return True if this event has already ended.
+
+        Compares end_date against the current UTC time. Used for
+        filtering historical events in list views and reports.
+
+        Returns:
+            bool: True if end_date is before the current moment.
+        """
+        return self.end_date < datetime.now(timezone.utc)
